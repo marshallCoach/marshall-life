@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>R. Marshall — Past &amp; Future</title>
+<style>
+  :root{
+    --navy:#1C2D37;--gold:#C5A059;--charcoal:#2D2D2D;--muted:#757575;
+    --bg:#FAF9F5;--line:#E5E5E0;
+    --font-display:'Didot','Playfair Display',Georgia,'Times New Roman',serif;
+    --font-serif:Georgia,'Times New Roman',Times,serif;
+    --font-sans:'Helvetica Neue',Arial,sans-serif;
+    box-sizing:border-box;
+  }
+  *{box-sizing:inherit;margin:0;padding:0}
+  body{background:var(--bg);color:var(--charcoal);font-family:var(--font-serif);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+
+  .xnav{background:#FFFFFF;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2000;
+    display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem}
+  .xnav-brand{font-family:var(--font-display);font-weight:900;font-size:1.25rem;letter-spacing:.05em;color:var(--navy);text-decoration:none}
+  .xnav-links{font-family:var(--font-sans);font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .xnav-links a{color:var(--charcoal);text-decoration:none;margin-left:1.5rem}
+  .xnav-links a.is-current{color:var(--gold)}
+  @media(max-width:600px){.xnav{padding:.85rem 1rem}.xnav-links a{margin-left:1rem}}
+
+  .cover{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:clamp(3rem,9vw,7rem) 2rem 4rem}
+  .eyebrow{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.28em;color:var(--gold);font-size:.8rem;margin-bottom:1rem}
+  h1{font-family:var(--font-display);font-weight:700;color:var(--navy);font-size:clamp(2.6rem,8vw,5rem);line-height:1.05;letter-spacing:-.02em;margin-bottom:1.25rem}
+  h1 .amp{color:var(--gold);font-style:italic}
+  .lede{font-size:clamp(1.05rem,2.2vw,1.35rem);max-width:640px;color:var(--charcoal)}
+  .rule{width:64px;height:2px;background:var(--gold);margin:2.25rem 0}
+
+  .cards{display:grid;grid-template-columns:1fr;gap:1.5rem;margin-top:.5rem}
+  @media(min-width:760px){.cards{grid-template-columns:1fr 1fr}}
+  .entry{display:block;text-decoration:none;color:inherit;background:#FFFFFF;border:1px solid var(--line);border-radius:12px;
+    padding:2rem;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  .entry:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(28,45,55,.10);border-color:var(--gold)}
+  .entry .kicker{font-family:var(--font-sans);text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:700;color:var(--gold);margin-bottom:.75rem}
+  .entry h2{font-family:var(--font-display);color:var(--navy);font-size:1.9rem;font-weight:700;margin-bottom:.5rem}
+  .entry p{color:var(--muted);font-size:1rem}
+  .entry .go{display:inline-block;margin-top:1.25rem;font-family:var(--font-sans);font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+  .entry .go::after{content:" \2192";color:var(--gold)}
+  .entry.primary{border-color:var(--navy)}
+  .entry.primary .kicker{color:var(--navy)}
+
+  footer{color:var(--muted);font-size:.8rem;text-align:center;padding:2rem;border-top:1px solid var(--line);font-family:var(--font-sans);letter-spacing:.04em}
+</style>
+</head>
+<body>
+<nav class="xnav">
+  <a class="xnav-brand" href="index.html">R. MARSHALL</a>
+  <div class="xnav-links">
+    <a href="past/">Past</a>
+    <a href="future/">Future</a>
+  </div>
+</nav>
+
+<main class="cover">
+  <p class="eyebrow">R. Marshall</p>
+  <h1>Past <span class="amp">&amp;</span> Future</h1>
+  <div class="rule"></div>
+  <p class="lede">Two records, one life. The archive behind, laid out chapter by chapter &mdash; and the ledger ahead, every assumption a control you can move.</p>
+
+  <div class="cards">
+    <a class="entry primary" href="past/">
+      <div class="kicker">The Past &mdash; Default</div>
+      <h2>Life Archive</h2>
+      <p>The memoir and executive portfolio &mdash; chapters, milestones, and the record so far.</p>
+      <span class="go">Enter the archive</span>
+    </a>
+    <a class="entry" href="future/">
+      <div class="kicker">The Future</div>
+      <h2>Life Budget</h2>
+      <p>An affordability tool. Move a slider and the whole picture recomputes &mdash; nothing hardcoded.</p>
+      <span class="go">Open the ledger</span>
+    </a>
+  </div>
+</main>
+
+<footer>Private &middot; R. Marshall</footer>
+</body>
+</html>

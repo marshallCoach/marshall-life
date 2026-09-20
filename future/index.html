@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life Budget — R. Marshall</title>
+<style>
+  :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+    /* Editorial palette — matched to the Life Archive */
+    --bg:#FAF9F5;--card:#FFFFFF;--card2:#F4F1EA;--line:#E5E5E0;--tx:#2D2D2D;--mut:#757575;
+    --acc:#C5A059;--navy:#1C2D37;
+    --good:#6E9E76;--goodbg:#E3EFE4;--goodtx:#2F5D3A;
+    --warn:#C5A059;--warnbg:#F5EAD1;--warntx:#8A6D1F;
+    --bad:#B5544B;--badbg:#F2DEDE;--badtx:#8F2D2D;
+    --font-display:'Didot','Playfair Display',Georgia,'Times New Roman',serif;
+    --font-serif:Georgia,'Times New Roman',Times,serif;
+    --font-sans:'Helvetica Neue',Arial,sans-serif;}
+  *{box-sizing:inherit}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font-serif);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  /* ---- cross-site nav (shared shell) ---- */
+  .xnav{background:#FFFFFF;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2000;
+    display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem}
+  .xnav-brand{font-family:var(--font-display);font-weight:900;font-size:1.25rem;letter-spacing:.05em;color:var(--navy);text-decoration:none}
+  .xnav-links{font-family:var(--font-sans);font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .xnav-links a{color:var(--tx);text-decoration:none;margin-left:1.5rem}
+  .xnav-links a.is-current{color:var(--acc)}
+  @media(max-width:600px){.xnav{padding:.85rem 1rem}.xnav-links a{margin-left:1rem}}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 16px 56px}
+  h1{font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em}
+  .eyebrow{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.25em;color:var(--acc);font-size:.72rem;margin:0 0 .5rem}
+  .sub{color:var(--mut);font-size:15px;font-style:italic;margin:0 0 24px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:840px){.grid{grid-template-columns:360px 1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:0 1px 2px rgba(28,45,55,.04)}
+  .card h2{font-family:var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin:0 0 14px}
+  .row{margin-bottom:16px}.row:last-child{margin-bottom:0}
+  .lab{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:6px}
+  .lab b{font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy)}
+  input[type=range]{width:100%;accent-color:var(--acc);height:22px}
+  input[type=number]{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:8px;padding:8px 10px;font-size:14px;font-variant-numeric:tabular-nums;font-family:var(--font-serif)}
+  .verdict{border-radius:10px;padding:18px;margin-bottom:16px;border:1px solid}
+  .verdict .tag{font-family:var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .verdict .big{font-family:var(--font-display);font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;margin:2px 0}
+  .verdict .note{font-size:14px;opacity:.92}
+  .v-good{background:var(--goodbg);border-color:#c2e0cb;color:var(--goodtx)}
+  .v-warn{background:var(--warnbg);border-color:#e6d3a3;color:var(--warntx)}
+  .v-bad{background:var(--badbg);border-color:#e6bcbc;color:var(--badtx)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .stat .k{font-family:var(--font-sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+  .stat .v{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .bar{display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:7px}
+  .bar .nm{width:132px;color:var(--mut);flex:none}
+  .bar .track{flex:1;background:var(--card2);border-radius:6px;height:16px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:6px}
+  .bar .amt{width:78px;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+  .dti{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .gauge .g-lab{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+  .gauge .g-track{position:relative;background:var(--card2);border-radius:6px;height:10px}
+  .gauge .g-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+  .gauge .g-cap{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--navy);opacity:.55}
+  details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  summary{cursor:pointer;font-size:13px;color:var(--mut);font-weight:600}
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .mini label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
+  .foot{color:var(--mut);font-size:12px;margin-top:18px;line-height:1.6}
+  .pill{display:inline-block;font-family:var(--font-sans);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px}
+  .p-ok{background:var(--goodbg);color:var(--goodtx)}.p-no{background:var(--badbg);color:var(--badtx)}
+  .panels{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+  @media(min-width:900px){.panels{grid-template-columns:1fr 1fr}}
+  .panel h3{font-size:14px;font-weight:600;margin:0 0 3px}
+  .panel .psub{font-size:12px;color:var(--mut);margin:0 0 10px}
+  .scroll{overflow-x:auto}
+  table.mx{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+  table.mx th,table.mx td{padding:7px 6px;text-align:center;white-space:nowrap}
+  table.mx thead th{color:var(--mut);font-weight:600;border-bottom:1px solid var(--line)}
+  table.mx tbody th{color:var(--tx);font-weight:600;text-align:right;padding-right:10px}
+  table.mx td{border-radius:6px;font-weight:600}
+  .legend{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:10px;flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<nav class="xnav">
+  <a class="xnav-brand" href="../index.html">R. MARSHALL</a>
+  <div class="xnav-links">
+    <a href="../past/">Past</a>
+    <a href="../future/" class="is-current">Future</a>
+  </div>
+</nav>
+<div class="wrap">
+  <p class="eyebrow">The Future &mdash; Life Budget</p>
+  <h1>Can I afford it?</h1>
+  <p class="sub">Every assumption is a control. Move a slider, everything recomputes. Nothing here is hardcoded.</p>
+  <div class="grid">
+    <div class="card">
+      <h2>Wizards &amp; controls</h2>
+      <div class="row"><div class="lab"><span>Gross salary (test)</span><b id="l_sal"></b></div><input type="range" id="sal" min="120000" max="450000" step="5000"></div>
+      <div class="row"><div class="lab"><span>Home price</span><b id="l_price"></b></div><input type="range" id="price" min="300000" max="1200000" step="10000"></div>
+      <div class="row"><div class="lab"><span>Interest rate</span><b id="l_rate"></b></div><input type="range" id="rate" min="4" max="10" step="0.05"></div>
+      <div class="row"><div class="lab"><span>Down payment</span><b id="l_down"></b></div><input type="range" id="down" min="5" max="40" step="1"></div>
+      <div class="row"><div class="lab"><span>Savings target (of net)</span><b id="l_sav"></b></div><input type="range" id="sav" min="0" max="25" step="1"></div>
+      <details><summary>Advanced assumptions &amp; living costs</summary>
+        <div class="mini">
+          <div><label>Loan term (yrs)</label><input type="number" id="term" step="1"></div>
+          <div><label>Property tax rate %</label><input type="number" id="ptax" step="0.05"></div>
+          <div><label>Insurance $/mo</label><input type="number" id="ins" step="10"></div>
+          <div><label>Effective tax rate %</label><input type="number" id="etax" step="0.5"></div>
+          <div><label>Existing home $/mo (fixed)</label><input type="number" id="exhome" step="50" disabled style="opacity:.6"></div>
+          <div><label>Car payment $/mo</label><input type="number" id="car" step="25"></div>
+          <div><label>Auto insurance $/mo</label><input type="number" id="autoins" step="10"></div>
+          <div><label>Home ops $/mo</label><input type="number" id="ops" step="25"></div>
+          <div><label>Food/groceries $/mo</label><input type="number" id="food" step="25"></div>
+          <div><label>Lifestyle rest $/mo</label><input type="number" id="life" step="25"></div>
+        </div>
+      </details>
+    </div>
+    <div>
+      <div class="verdict" id="verdict"><div class="tag" id="v_tag"></div><div class="big" id="v_big"></div><div class="note" id="v_note"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Net take-home / mo</div><div class="v" id="s_net"></div></div>
+        <div class="stat"><div class="k">Total outgoings / mo</div><div class="v" id="s_out"></div></div>
+        <div class="stat"><div class="k">New home PITI / mo</div><div class="v" id="s_piti"></div></div>
+        <div class="stat"><div class="k">Gross needed (savings)</div><div class="v" id="s_gross"></div></div>
+      </div>
+      <div class="card"><h2>Where the money goes</h2><div id="bars"></div></div>
+      <div class="card" style="margin-top:16px"><h2>Lender check &mdash; debt-to-income</h2>
+        <div class="dti">
+          <div class="gauge"><div class="g-lab"><span>Front-end (housing) <span id="dti_f_p" class="pill"></span></span><b id="dti_f"></b></div><div class="g-track"><div class="g-fill" id="dti_f_fill"></div><div class="g-cap" style="left:28%"></div></div><div style="font-size:11px;color:var(--mut);margin-top:4px">cap 28%</div></div>
+          <div class="gauge"><div class="g-lab"><span>Back-end (all debt) <span id="dti_b_p" class="pill"></span></span><b id="dti_b"></b></div><div class="g-track"><div class="g-fill" id="dti_b_fill"></div><div class="g-cap" style="left:43%"></div></div><div style="font-size:11px;color:var(--mut);margin-top:4px">cap 43%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:24px">
+    <h2>Monthly position by salary &amp; rate</h2>
+    <p class="sub" style="margin:-6px 0 4px">Each cell is your monthly surplus / (deficit) after all outgoings — including the fixed $5,000 existing home — at that salary and rate. Uses your current price, down payment and tax settings.</p>
+    <div class="panels" style="grid-template-columns:1fr">
+      <div class="panel"><p class="psub" id="keep_sub"></p><div class="scroll"><table class="mx" id="tbl_keep"></table></div></div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--good)"></i>Affordable &mdash; clears savings target</span>
+      <span><i class="sw" style="background:var(--warn)"></i>Tight &mdash; positive, under target</span>
+      <span><i class="sw" style="background:var(--bad)"></i>Deficit</span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:24px">
+    <h2>Required gross salary &mdash; by house price &amp; rate</h2>
+    <p class="sub" style="margin:-6px 0 4px">The inverse view: the gross salary you'd need to carry that price at that rate and still hit your <span id="gg_sav"></span>% savings target. Colored against your current salary slider (<b id="gg_cur"></b>).</p>
+    <div class="panels" style="grid-template-columns:1fr">
+      <div class="panel"><p class="psub" id="gg_keep_sub"></p><div class="scroll"><table class="mx" id="gg_keep"></table></div></div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--good)"></i>Within your salary</span>
+      <span><i class="sw" style="background:var(--warn)"></i>Up to 10% over</span>
+      <span><i class="sw" style="background:var(--bad)"></i>Out of reach</span>
+    </div>
+  </div>
+  <p class="foot" id="foot"></p>
+</div>
+<script>
+const F0=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString();
+const D={sal:220000,price:750000,rate:6.75,down:20,sav:12,term:30,ptax:2.3,ins:200,etax:28,exhome:5000,car:600,autoins:150,ops:950,food:900,life:1750};
+let s=Object.assign({},D);
+try{const raw=localStorage.getItem('lifebudget');if(raw)s=Object.assign(s,JSON.parse(raw));}catch(e){}
+s.exhome=5000;
+const SAL=[175000,200000,225000,250000,275000];
+const RATES=[5.5,6,6.5,7,7.5,8,8.5,9];
+const ids=Object.keys(D);
+function bind(){ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;el.value=s[id];
+  el.addEventListener('input',function(){s[id]=parseFloat(el.value)||0;save();render();});});}
+function save(){try{localStorage.setItem('lifebudget',JSON.stringify(s));}catch(e){}}
+function pmt(loan,ratePct,term){var r=ratePct/100/12,n=term*12;return r===0?loan/n:loan*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);}
+function pitiFor(ratePct){var loan=s.price*(1-s.down/100);return pmt(loan,ratePct,s.term)+s.price*(s.ptax/100)/12+s.ins;}
+function netFor(sal){return sal*(1-s.etax/100)/12;}
+function calc(){var piti=pitiFor(s.rate);var baseline=s.exhome+s.car+s.autoins+s.ops+s.food+s.life;var outgoings=piti+baseline;
+  var net=netFor(s.sal);var surplus=net-outgoings;var wantSav=net*(s.sav/100);var reqNet=outgoings/(1-s.sav/100);
+  var reqGross=reqNet/(1-s.etax/100)*12;var gm=s.sal/12;
+  return{piti:piti,baseline:baseline,outgoings:outgoings,net:net,surplus:surplus,wantSav:wantSav,reqNet:reqNet,reqGross:reqGross,
+    pi:pmt(s.price*(1-s.down/100),s.rate,s.term),ptaxMo:s.price*(s.ptax/100)/12,dtiF:piti/gm,dtiB:(piti+s.exhome+s.car)/gm};}
+function tier(surplus,net){var want=net*(s.sav/100);if(surplus<0)return['#F2DEDE','#8F2D2D'];if(surplus<want)return['#F5EAD1','#8A6D1F'];return['#E3EFE4','#2F5D3A'];}
+function buildGrid(el,existingHome){var h='<thead><tr><th>Salary</th>';RATES.forEach(function(r){h+='<th>'+r+'%</th>';});h+='</tr></thead><tbody>';
+  var baseNoHome=s.car+s.autoins+s.ops+s.food+s.life+existingHome;
+  SAL.forEach(function(sal){var net=netFor(sal);h+='<tr><th>'+F0(sal)+'</th>';
+    RATES.forEach(function(r){var out=pitiFor(r)+baseNoHome;var sur=net-out;var t=tier(sur,net);h+='<td style="background:'+t[0]+';color:'+t[1]+'">'+F0(sur)+'</td>';});
+    h+='</tr>';});el.innerHTML=h+'</tbody>';}
+var PRICES=[500000,600000,700000,750000,800000,900000];
+function pitiPrice(price,ratePct){var loan=price*(1-s.down/100);return pmt(loan,ratePct,s.term)+price*(s.ptax/100)/12+s.ins;}
+function reqGrossFor(price,ratePct,existingHome){var baseNoHome=s.car+s.autoins+s.ops+s.food+s.life+existingHome;
+  var out=pitiPrice(price,ratePct)+baseNoHome;var reqNet=out/(1-s.sav/100);return reqNet/(1-s.etax/100)*12;}
+function tierGross(req){if(req<=s.sal)return['#E3EFE4','#2F5D3A'];if(req<=s.sal*1.1)return['#F5EAD1','#8A6D1F'];return['#F2DEDE','#8F2D2D'];}
+function buildGrossGrid(el,existingHome){var h='<thead><tr><th>Price</th>';RATES.forEach(function(r){h+='<th>'+r+'%</th>';});h+='</tr></thead><tbody>';
+  PRICES.forEach(function(p){h+='<tr><th>'+F0(p)+'</th>';
+    RATES.forEach(function(r){var req=reqGrossFor(p,r,existingHome);var t=tierGross(req);h+='<td style="background:'+t[0]+';color:'+t[1]+'">'+F0(req)+'</td>';});
+    h+='</tr>';});el.innerHTML=h+'</tbody>';}
+function render(){
+  document.getElementById('l_sal').textContent=F0(s.sal);
+  document.getElementById('l_price').textContent=F0(s.price);
+  document.getElementById('l_rate').textContent=s.rate.toFixed(2)+'%';
+  document.getElementById('l_down').textContent=s.down+'%';
+  document.getElementById('l_sav').textContent=s.sav+'%';
+  var c=calc();
+  document.getElementById('s_net').textContent=F0(c.net);
+  document.getElementById('s_out').textContent=F0(c.outgoings);
+  document.getElementById('s_piti').textContent=F0(c.piti);
+  document.getElementById('s_gross').textContent=F0(c.reqGross);
+  var v=document.getElementById('verdict'),tag=document.getElementById('v_tag'),big=document.getElementById('v_big'),note=document.getElementById('v_note');
+  v.className='verdict';
+  if(c.surplus<0){v.classList.add('v-bad');tag.textContent='Not affordable';big.textContent=F0(c.surplus)+' / mo';note.textContent='Monthly deficit before saving a dollar. Needs ~'+F0(c.reqGross)+' gross to work.';}
+  else if(c.surplus<c.wantSav){v.classList.add('v-warn');tag.textContent='Tight — under savings target';big.textContent='+'+F0(c.surplus)+' / mo';note.textContent='Covers the bills but misses your '+s.sav+'% goal ('+F0(c.wantSav)+'/mo). Target gross ~'+F0(c.reqGross)+'.';}
+  else{v.classList.add('v-good');tag.textContent='Affordable';big.textContent='+'+F0(c.surplus)+' / mo';note.textContent='Covers all outgoings and clears your '+s.sav+'% savings target.';}
+  var items=[['New home PITI',c.piti,'#C5A059'],['Existing home',s.exhome,'#1C2D37'],['Car + insurance',s.car+s.autoins,'#B7AE9E'],['Home operations',s.ops,'#B7AE9E'],['Food + lifestyle',s.food+s.life,'#B7AE9E']];
+  var max=Math.max(c.net,c.outgoings);var html='';
+  items.forEach(function(it){html+='<div class="bar"><span class="nm">'+it[0]+'</span><span class="track"><span class="fill" style="width:'+(it[1]/max*100)+'%;background:'+it[2]+'"></span></span><span class="amt">'+F0(it[1])+'</span></div>';});
+  html+='<div class="bar" style="margin-top:10px"><span class="nm" style="color:var(--tx)">Net take-home</span><span class="track"><span class="fill" style="width:'+(c.net/max*100)+'%;background:'+(c.surplus<0?'#B5544B':'#6E9E76')+'"></span></span><span class="amt">'+F0(c.net)+'</span></div>';
+  document.getElementById('bars').innerHTML=html;
+  setGauge('dti_f',c.dtiF,0.28);setGauge('dti_b',c.dtiB,0.43);
+  document.getElementById('keep_sub').textContent='Existing home at '+F0(s.exhome)+'/mo';
+  buildGrid(document.getElementById('tbl_keep'),s.exhome);
+  document.getElementById('gg_sav').textContent=s.sav;
+  document.getElementById('gg_cur').textContent=F0(s.sal);
+  document.getElementById('gg_keep_sub').textContent='Existing home at '+F0(s.exhome)+'/mo';
+  buildGrossGrid(document.getElementById('gg_keep'),s.exhome);
+  document.getElementById('foot').innerHTML='Grids use your current price '+F0(s.price)+', '+s.down+'% down, '+s.ptax+'% property tax, '+s.etax+'% effective tax. Take-home = salary × (1 - tax) / 12; it does not change with rate, so each cell moves only because PITI does. Set tax to 2.5% to reproduce the $18,728/yr assessment in the earlier PITI docs.';
+}
+function setGauge(id,val,cap){document.getElementById(id).textContent=(val*100).toFixed(0)+'%';
+  var fill=document.getElementById(id+'_fill');fill.style.width=Math.min(val/(cap*2),1)*100+'%';
+  var over=val>cap;fill.style.background=over?'#B5544B':'#6E9E76';
+  var pill=document.getElementById(id+'_p');pill.textContent=over?'over':'ok';pill.className='pill '+(over?'p-no':'p-ok');}
+bind();render();
+</script>
+</body>
+</html>
