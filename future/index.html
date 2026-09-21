@@ -27,6 +27,11 @@
   .xnav-links a.is-current{color:var(--acc)}
   @media(max-width:600px){.xnav{padding:.85rem 1rem}.xnav-links a{margin-left:1rem}}
 
+  /* ---- scenario toggle (Home purchase / Renting) ---- */
+  .scentabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:0 0 22px;background:#fff}
+  .scentabs a{font-family:var(--font-sans);font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.1rem;color:var(--mut);text-decoration:none}
+  .scentabs a.on{background:var(--navy);color:#fff}
+
   .wrap{max-width:1120px;margin:0 auto;padding:28px 16px 56px}
   h1{font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em}
   .eyebrow{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.25em;color:var(--acc);font-size:.72rem;margin:0 0 .5rem}
@@ -95,6 +100,7 @@
   <p class="eyebrow">The Future &mdash; Life Budget</p>
   <h1>Can I afford it?</h1>
   <p class="sub">Every assumption is a control. Move a slider, everything recomputes. Nothing here is hardcoded.</p>
+  <div class="scentabs"><a class="on" href="./">Home purchase</a><a href="renting/">Renting</a></div>
   <div class="grid">
     <div class="card">
       <h2>Wizards &amp; controls</h2>

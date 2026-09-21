@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life Budget · Renting — R. Marshall</title>
+<style>
+  :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+    /* Editorial palette — matched to the Life Archive */
+    --bg:#FAF9F5;--card:#FFFFFF;--card2:#F4F1EA;--line:#E5E5E0;--tx:#2D2D2D;--mut:#757575;
+    --acc:#C5A059;--navy:#1C2D37;
+    --good:#6E9E76;--goodbg:#E3EFE4;--goodtx:#2F5D3A;
+    --warn:#C5A059;--warnbg:#F5EAD1;--warntx:#8A6D1F;
+    --bad:#B5544B;--badbg:#F2DEDE;--badtx:#8F2D2D;
+    --font-display:'Didot','Playfair Display',Georgia,'Times New Roman',serif;
+    --font-serif:Georgia,'Times New Roman',Times,serif;
+    --font-sans:'Helvetica Neue',Arial,sans-serif;}
+  *{box-sizing:inherit}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font-serif);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  /* ---- cross-site nav (shared shell) ---- */
+  .xnav{background:#FFFFFF;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2000;
+    display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem}
+  .xnav-brand{font-family:var(--font-display);font-weight:900;font-size:1.25rem;letter-spacing:.05em;color:var(--navy);text-decoration:none}
+  .xnav-links{font-family:var(--font-sans);font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .xnav-links a{color:var(--tx);text-decoration:none;margin-left:1.5rem}
+  .xnav-links a.is-current{color:var(--acc)}
+  @media(max-width:600px){.xnav{padding:.85rem 1rem}.xnav-links a{margin-left:1rem}}
+
+  /* ---- scenario toggle (Home purchase / Renting) ---- */
+  .scentabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:0 0 22px;background:#fff}
+  .scentabs a{font-family:var(--font-sans);font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.1rem;color:var(--mut);text-decoration:none}
+  .scentabs a.on{background:var(--navy);color:#fff}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 16px 56px}
+  h1{font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em}
+  .eyebrow{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.25em;color:var(--acc);font-size:.72rem;margin:0 0 .5rem}
+  .sub{color:var(--mut);font-size:15px;font-style:italic;margin:0 0 24px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:840px){.grid{grid-template-columns:360px 1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:0 1px 2px rgba(28,45,55,.04)}
+  .card h2{font-family:var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin:0 0 14px}
+  .row{margin-bottom:16px}.row:last-child{margin-bottom:0}
+  .lab{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:6px}
+  .lab b{font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy)}
+  input[type=range]{width:100%;accent-color:var(--acc);height:22px}
+  input[type=number]{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:8px;padding:8px 10px;font-size:14px;font-variant-numeric:tabular-nums;font-family:var(--font-serif)}
+  .verdict{border-radius:10px;padding:18px;margin-bottom:16px;border:1px solid}
+  .verdict .tag{font-family:var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .verdict .big{font-family:var(--font-display);font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;margin:2px 0}
+  .verdict .note{font-size:14px;opacity:.92}
+  .v-good{background:var(--goodbg);border-color:#c2e0cb;color:var(--goodtx)}
+  .v-warn{background:var(--warnbg);border-color:#e6d3a3;color:var(--warntx)}
+  .v-bad{background:var(--badbg);border-color:#e6bcbc;color:var(--badtx)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .stat .k{font-family:var(--font-sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+  .stat .v{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .bar{display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:7px}
+  .bar .nm{width:132px;color:var(--mut);flex:none}
+  .bar .track{flex:1;background:var(--card2);border-radius:6px;height:16px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:6px}
+  .bar .amt{width:78px;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+  details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  summary{cursor:pointer;font-size:13px;color:var(--mut);font-weight:600}
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .mini label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
+  .foot{color:var(--mut);font-size:12px;margin-top:18px;line-height:1.6}
+  .pill{display:inline-block;font-family:var(--font-sans);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px}
+  .scroll{overflow-x:auto}
+  table.mx{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+  table.mx th,table.mx td{padding:7px 6px;text-align:center;white-space:nowrap}
+  table.mx thead th{color:var(--mut);font-weight:600;border-bottom:1px solid var(--line)}
+  table.mx tbody th{color:var(--tx);font-weight:600;text-align:right;padding-right:10px}
+  table.mx td{border-radius:6px;font-weight:600}
+  .legend{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:10px;flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<nav class="xnav">
+  <a class="xnav-brand" href="../../index.html">R. MARSHALL</a>
+  <div class="xnav-links">
+    <a href="../../past/">Past</a>
+    <a href="../../future/" class="is-current">Future</a>
+  </div>
+</nav>
+<div class="wrap">
+  <p class="eyebrow">The Future &mdash; Life Budget</p>
+  <h1>Can I afford to rent?</h1>
+  <p class="sub">Scenario B &mdash; a one-year rental while carrying the existing home. Move a slider, everything recomputes. Nothing here is hardcoded.</p>
+  <div class="scentabs"><a href="../">Home purchase</a><a class="on" href="./">Renting</a></div>
+  <div class="grid">
+    <div class="card">
+      <h2>Wizards &amp; controls</h2>
+      <div class="row"><div class="lab"><span>Gross salary (test)</span><b id="l_sal"></b></div><input type="range" id="sal" min="120000" max="450000" step="5000"></div>
+      <div class="row"><div class="lab"><span>Monthly rent</span><b id="l_rent"></b></div><input type="range" id="rent" min="2000" max="7000" step="50"></div>
+      <div class="row"><div class="lab"><span>Rental term (months)</span><b id="l_term"></b></div><input type="range" id="term" min="1" max="24" step="1"></div>
+      <div class="row"><div class="lab"><span>Starting liquid assets</span><b id="l_start"></b></div><input type="range" id="start" min="0" max="500000" step="5000"></div>
+      <details><summary>Advanced assumptions &amp; living costs</summary>
+        <div class="mini">
+          <div><label>Effective tax rate %</label><input type="number" id="etax" step="0.5"></div>
+          <div><label>Existing home $/mo (fixed)</label><input type="number" id="exhome" step="50" disabled style="opacity:.6"></div>
+          <div><label>Car payment $/mo</label><input type="number" id="car" step="25"></div>
+          <div><label>Auto insurance $/mo</label><input type="number" id="autoins" step="10"></div>
+          <div><label>Home ops $/mo</label><input type="number" id="ops" step="25"></div>
+          <div><label>Food/groceries $/mo</label><input type="number" id="food" step="25"></div>
+          <div><label>Lifestyle rest $/mo</label><input type="number" id="life" step="25"></div>
+        </div>
+      </details>
+    </div>
+    <div>
+      <div class="verdict" id="verdict"><div class="tag" id="v_tag"></div><div class="big" id="v_big"></div><div class="note" id="v_note"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Net take-home / mo</div><div class="v" id="s_net"></div></div>
+        <div class="stat"><div class="k">Total outgoings / mo</div><div class="v" id="s_out"></div></div>
+        <div class="stat"><div class="k">Net cash flow / mo</div><div class="v" id="s_cf"></div></div>
+        <div class="stat"><div class="k">Ending portfolio</div><div class="v" id="s_end"></div></div>
+      </div>
+      <div class="card"><h2>Where the money goes</h2><div id="bars"></div></div>
+      <div class="card" style="margin-top:16px"><h2>Break-even rent</h2>
+        <p class="sub" style="margin:0 0 6px">The monthly rent at which your outgoings exactly match take-home — above it you draw down liquid assets.</p>
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--navy)" id="be"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <h2 id="rm_title">Rental matrix &amp; portfolio projection</h2>
+    <p class="sub" style="margin:-6px 0 4px" id="rm_sub"></p>
+    <div class="scroll"><table class="mx" id="tbl_rent"></table></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--good)"></i>Green &mdash; cash-flow positive</span>
+      <span><i class="sw" style="background:var(--warn)"></i>Yellow &mdash; drawdown, portfolio holds</span>
+      <span><i class="sw" style="background:var(--bad)"></i>Red &mdash; drawdown over 25% of starting assets</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <h2>Monthly cash flow by salary &amp; rent</h2>
+    <p class="sub" style="margin:-6px 0 4px">Each cell is your monthly surplus / (deficit) after all outgoings at that salary and rent. Colored against your current starting assets (<b id="g_start"></b>) and <span id="g_term"></span>-month term.</p>
+    <div class="scroll"><table class="mx" id="tbl_grid"></table></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--good)"></i>Cash-flow positive</span>
+      <span><i class="sw" style="background:var(--warn)"></i>Drawdown, portfolio holds</span>
+      <span><i class="sw" style="background:var(--bad)"></i>Drawdown over 25% of assets</span>
+    </div>
+  </div>
+  <p class="foot" id="foot"></p>
+</div>
+<script>
+const F0=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString();
+const FS=n=>(n<0?'-$':'+$')+Math.abs(Math.round(n)).toLocaleString();
+const D={sal:220000,rent:4000,term:12,start:200000,etax:28,exhome:5000,car:600,autoins:150,ops:950,food:900,life:1750};
+let s=Object.assign({},D);
+try{const raw=localStorage.getItem('lifebudget_rent');if(raw)s=Object.assign(s,JSON.parse(raw));}catch(e){}
+s.exhome=5000;
+const SAL=[175000,200000,225000,250000,275000];
+const RENTS=[3000,3500,4000,4500,5000,5500,6000];
+const LADDER=[3700,4000,4300,4600,5000];
+const ids=Object.keys(D);
+function bind(){ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;el.value=s[id];
+  el.addEventListener('input',function(){s[id]=parseFloat(el.value)||0;save();render();});});}
+function save(){try{localStorage.setItem('lifebudget_rent',JSON.stringify(s));}catch(e){}}
+function fixed(){return s.exhome+s.car+s.autoins+s.ops+s.food+s.life;}
+function netFor(sal){return sal*(1-s.etax/100)/12;}
+function rag(cf,endPort){if(cf>=0)return 'good';if(endPort<s.start*0.75)return 'bad';return 'warn';}
+var COL={good:['#E3EFE4','#2F5D3A'],warn:['#F5EAD1','#8A6D1F'],bad:['#F2DEDE','#8F2D2D']};
+function calc(){var net=netFor(s.sal);var out=fixed()+s.rent;var cf=net-out;var yr=cf*s.term;var endPort=s.start+yr;
+  var be=net-fixed();return{net:net,out:out,cf:cf,yr:yr,endPort:endPort,be:be};}
+function render(){
+  document.getElementById('l_sal').textContent=F0(s.sal);
+  document.getElementById('l_rent').textContent=F0(s.rent);
+  document.getElementById('l_term').textContent=s.term+' mo';
+  document.getElementById('l_start').textContent=F0(s.start);
+  var c=calc();
+  document.getElementById('s_net').textContent=F0(c.net);
+  document.getElementById('s_out').textContent=F0(c.out);
+  document.getElementById('s_cf').textContent=FS(c.cf);
+  document.getElementById('s_end').textContent=F0(c.endPort);
+  document.getElementById('be').textContent=F0(c.be)+' / mo';
+  var v=document.getElementById('verdict'),tag=document.getElementById('v_tag'),big=document.getElementById('v_big'),note=document.getElementById('v_note');
+  v.className='verdict';var r=rag(c.cf,c.endPort);
+  if(r==='good'){v.classList.add('v-good');tag.textContent='Green — cash-flow positive';big.textContent=FS(c.cf)+' / mo';
+    note.textContent='Rent sits under your take-home. Over '+s.term+' months your '+F0(s.start)+' grows to '+F0(c.endPort)+'.';}
+  else if(r==='warn'){v.classList.add('v-warn');tag.textContent='Yellow — manageable drawdown';big.textContent=FS(c.cf)+' / mo';
+    note.textContent='Negative cash flow, but liquid assets absorb it — '+F0(c.endPort)+' left after '+s.term+' months. Break-even rent is '+F0(c.be)+'.';}
+  else{v.classList.add('v-bad');tag.textContent='Red — unsustainable';big.textContent=FS(c.cf)+' / mo';
+    note.textContent='Over '+s.term+' months this draws down more than 25% of your assets ('+F0(c.endPort)+' left of '+F0(s.start)+'). Cap rent near '+F0(c.be)+' to break even.';}
+  var items=[['Existing home',s.exhome,'#1C2D37'],['Rent',s.rent,'#C5A059'],['Car + insurance',s.car+s.autoins,'#B7AE9E'],['Home operations',s.ops,'#B7AE9E'],['Food + lifestyle',s.food+s.life,'#B7AE9E']];
+  var max=Math.max(c.net,c.out);var html='';
+  items.forEach(function(it){html+='<div class="bar"><span class="nm">'+it[0]+'</span><span class="track"><span class="fill" style="width:'+(it[1]/max*100)+'%;background:'+it[2]+'"></span></span><span class="amt">'+F0(it[1])+'</span></div>';});
+  html+='<div class="bar" style="margin-top:10px"><span class="nm" style="color:var(--tx)">Net take-home</span><span class="track"><span class="fill" style="width:'+(c.net/max*100)+'%;background:'+(c.cf<0?'#B5544B':'#6E9E76')+'"></span></span><span class="amt">'+F0(c.net)+'</span></div>';
+  document.getElementById('bars').innerHTML=html;
+
+  // Detailed rental matrix (faithful table)
+  document.getElementById('rm_title').textContent=s.term+'-month rental matrix & portfolio projection';
+  document.getElementById('rm_sub').textContent='At '+F0(s.sal)+' gross ('+F0(c.net)+'/mo net) with '+F0(s.start)+' starting liquid assets. Fixed outgoings excluding rent: '+F0(fixed())+'/mo.';
+  var net=c.net;var th='<thead><tr><th style="text-align:right">Monthly rent</th><th>Total outgoings</th><th>Net take-home</th><th>Net cash flow / mo</th><th>'+s.term+'-mo total</th><th>Ending portfolio</th><th>Status</th></tr></thead><tbody>';
+  LADDER.forEach(function(rent){var out=fixed()+rent;var cf=net-out;var yr=cf*s.term;var endPort=s.start+yr;var t=COL[rag(cf,endPort)];
+    var label=rag(cf,endPort)==='good'?'GREEN':(rag(cf,endPort)==='warn'?'YELLOW':'RED');
+    th+='<tr><th>'+F0(rent)+'</th><td>'+F0(out)+'</td><td>'+F0(net)+'</td><td style="background:'+t[0]+';color:'+t[1]+'">'+FS(cf)+'</td><td>'+FS(yr)+'</td><td>'+F0(endPort)+'</td><td style="background:'+t[0]+';color:'+t[1]+'">'+label+'</td></tr>';});
+  document.getElementById('tbl_rent').innerHTML=th+'</tbody>';
+
+  // Salary x rent grid
+  document.getElementById('g_start').textContent=F0(s.start);
+  document.getElementById('g_term').textContent=s.term;
+  var gh='<thead><tr><th>Salary</th>';RENTS.forEach(function(rt){gh+='<th>'+F0(rt)+'</th>';});gh+='</tr></thead><tbody>';
+  SAL.forEach(function(sal){var n=netFor(sal);gh+='<tr><th>'+F0(sal)+'</th>';
+    RENTS.forEach(function(rt){var cf=n-fixed()-rt;var endPort=s.start+cf*s.term;var t=COL[rag(cf,endPort)];
+      gh+='<td style="background:'+t[0]+';color:'+t[1]+'">'+FS(cf)+'</td>';});
+    gh+='</tr>';});
+  document.getElementById('tbl_grid').innerHTML=gh+'</tbody>';
+
+  document.getElementById('foot').innerHTML='Net take-home = salary × (1 − '+s.etax+'% tax) ÷ 12. Fixed outgoings (excl. rent) = existing home '+F0(s.exhome)+' + car & insurance '+F0(s.car+s.autoins)+' + home ops '+F0(s.ops)+' + food & lifestyle '+F0(s.food+s.life)+' = '+F0(fixed())+'/mo. Portfolio projection = starting assets + term × monthly cash flow (no market growth assumed). RAG: green = cash-flow positive; yellow = drawdown but under 25% of starting assets; red = drawdown exceeds 25% of starting assets (ending portfolio below 75% of the start). Defaults reproduce Scenario B ($220k salary, $200k starting assets, 12-month term).';
+}
+bind();render();
+</script>
+</body>
+</html>
