@@ -133,7 +133,7 @@
     <div class="legend">
       <span><i class="sw" style="background:var(--good)"></i>Green &mdash; cash-flow positive</span>
       <span><i class="sw" style="background:var(--warn)"></i>Yellow &mdash; drawdown, portfolio holds</span>
-      <span><i class="sw" style="background:var(--bad)"></i>Red &mdash; portfolio depleted within term</span>
+      <span><i class="sw" style="background:var(--bad)"></i>Red &mdash; drawdown over 25% of starting assets</span>
     </div>
   </div>
 
@@ -144,7 +144,7 @@
     <div class="legend">
       <span><i class="sw" style="background:var(--good)"></i>Cash-flow positive</span>
       <span><i class="sw" style="background:var(--warn)"></i>Drawdown, portfolio holds</span>
-      <span><i class="sw" style="background:var(--bad)"></i>Portfolio depleted</span>
+      <span><i class="sw" style="background:var(--bad)"></i>Drawdown over 25% of assets</span>
     </div>
   </div>
   <p class="foot" id="foot"></p>
@@ -165,7 +165,7 @@ function bind(){ids.forEach(function(id){var el=document.getElementById(id);if(!
 function save(){try{localStorage.setItem('lifebudget_rent',JSON.stringify(s));}catch(e){}}
 function fixed(){return s.exhome+s.car+s.autoins+s.ops+s.food+s.life;}
 function netFor(sal){return sal*(1-s.etax/100)/12;}
-function rag(cf,endPort){if(cf>=0)return 'good';if(endPort>0)return 'warn';return 'bad';}
+function rag(cf,endPort){if(cf>=0)return 'good';if(endPort<s.start*0.75)return 'bad';return 'warn';}
 var COL={good:['#E3EFE4','#2F5D3A'],warn:['#F5EAD1','#8A6D1F'],bad:['#F2DEDE','#8F2D2D']};
 function calc(){var net=netFor(s.sal);var out=fixed()+s.rent;var cf=net-out;var yr=cf*s.term;var endPort=s.start+yr;
   var be=net-fixed();return{net:net,out:out,cf:cf,yr:yr,endPort:endPort,be:be};}
@@ -187,7 +187,7 @@ function render(){
   else if(r==='warn'){v.classList.add('v-warn');tag.textContent='Yellow — manageable drawdown';big.textContent=FS(c.cf)+' / mo';
     note.textContent='Negative cash flow, but liquid assets absorb it — '+F0(c.endPort)+' left after '+s.term+' months. Break-even rent is '+F0(c.be)+'.';}
   else{v.classList.add('v-bad');tag.textContent='Red — unsustainable';big.textContent=FS(c.cf)+' / mo';
-    note.textContent='This draws your liquid assets below zero within '+s.term+' months. Cap rent near '+F0(c.be)+' to break even.';}
+    note.textContent='Over '+s.term+' months this draws down more than 25% of your assets ('+F0(c.endPort)+' left of '+F0(s.start)+'). Cap rent near '+F0(c.be)+' to break even.';}
   var items=[['Existing home',s.exhome,'#1C2D37'],['Rent',s.rent,'#C5A059'],['Car + insurance',s.car+s.autoins,'#B7AE9E'],['Home operations',s.ops,'#B7AE9E'],['Food + lifestyle',s.food+s.life,'#B7AE9E']];
   var max=Math.max(c.net,c.out);var html='';
   items.forEach(function(it){html+='<div class="bar"><span class="nm">'+it[0]+'</span><span class="track"><span class="fill" style="width:'+(it[1]/max*100)+'%;background:'+it[2]+'"></span></span><span class="amt">'+F0(it[1])+'</span></div>';});
@@ -213,7 +213,7 @@ function render(){
     gh+='</tr>';});
   document.getElementById('tbl_grid').innerHTML=gh+'</tbody>';
 
-  document.getElementById('foot').innerHTML='Net take-home = salary × (1 − '+s.etax+'% tax) ÷ 12. Fixed outgoings (excl. rent) = existing home '+F0(s.exhome)+' + car & insurance '+F0(s.car+s.autoins)+' + home ops '+F0(s.ops)+' + food & lifestyle '+F0(s.food+s.life)+' = '+F0(fixed())+'/mo. Portfolio projection = starting assets + term × monthly cash flow (no market growth assumed). RAG: green = cash-flow positive; yellow = drawdown but assets stay positive across the term; red = assets depleted within the term. Defaults reproduce Scenario B ($220k salary, $200k starting assets, 12-month term).';
+  document.getElementById('foot').innerHTML='Net take-home = salary × (1 − '+s.etax+'% tax) ÷ 12. Fixed outgoings (excl. rent) = existing home '+F0(s.exhome)+' + car & insurance '+F0(s.car+s.autoins)+' + home ops '+F0(s.ops)+' + food & lifestyle '+F0(s.food+s.life)+' = '+F0(fixed())+'/mo. Portfolio projection = starting assets + term × monthly cash flow (no market growth assumed). RAG: green = cash-flow positive; yellow = drawdown but under 25% of starting assets; red = drawdown exceeds 25% of starting assets (ending portfolio below 75% of the start). Defaults reproduce Scenario B ($220k salary, $200k starting assets, 12-month term).';
 }
 bind();render();
 </script>
